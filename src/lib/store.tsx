@@ -21,7 +21,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
     try {
       const s = localStorage.getItem(BOOKMARK_KEY);
       return s ? JSON.parse(s) : [];
-    } catch {
+    } catch (error) {
+      console.error('Error loading bookmarks from localStorage:', error);
       return [];
     }
   });
@@ -31,7 +32,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
     if (typeof window !== 'undefined') {
       try {
         localStorage.setItem(BOOKMARK_KEY, JSON.stringify(ids));
-      } catch (_) {}
+      } catch (error) {
+        console.error('Error saving bookmarks to localStorage:', error);
+      }
     }
   }, []);
 
