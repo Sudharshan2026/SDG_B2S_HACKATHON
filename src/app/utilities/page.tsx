@@ -2,14 +2,32 @@
 
 import { useState, useEffect } from 'react';
 import { useApp } from '@/lib/store';
-import { getUtilities, outages, alerts } from '@/lib/mock-data';
-import { Zap, Droplets, AlertTriangle } from 'lucide-react';
+import { outages, alerts } from '@/lib/mock-data';
+import { Zap, Droplets, AlertTriangle, Loader2 } from 'lucide-react';
+import type { Utility } from '@/lib/types';
 
 export default function UtilitiesPage() {
   const { panel } = useApp();
-  const [utilities, setUtilities] = useState(getUtilities());
+  const [utilities, setUtilities] = useState<Utility[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  useEffect(() => setUtilities(getUtilities()), [panel]);
+  useEffect(() => {
+    const fetchUtilities = async () => {
+      try {
+        const res = await fetch('/api/utilities');
+        if (res.ok) {
+          const data = await res.json();
+          setUtilities(data);
+        }
+      } catch (error) {
+        console.error('Failed to fetch utilities:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUtilities();
+  }, [panel]);
 
   if (panel !== 'user') {
     return (
@@ -30,6 +48,15 @@ export default function UtilitiesPage() {
     reduced: 'Reduced',
     outage: 'Outage',
   };
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center py-12 text-slate-500">
+        <Loader2 className="w-8 h-8 animate-spin mb-2" />
+        <p>Loading utilities...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8 pb-8">
