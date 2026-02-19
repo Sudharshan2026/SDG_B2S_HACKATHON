@@ -87,12 +87,15 @@ export default function SchemesPage() {
   const [category, setCategory] = useState<string>('all');
 
   /* 🔹 Combine real + demo schemes */
-  const baseSchemes = [...schemes, ...demoSchemes];
+  const baseSchemes = useMemo(() => [...schemes, ...demoSchemes], []);
 
-  const categories = [
-    'all',
-    ...Array.from(new Set(baseSchemes.map((s) => s.category))),
-  ];
+  const categories = useMemo(
+    () => [
+      'all',
+      ...Array.from(new Set(baseSchemes.map((s) => s.category))),
+    ],
+    [baseSchemes]
+  );
 
   const filtered = useMemo(() => {
     let list = baseSchemes.filter(
@@ -113,7 +116,7 @@ export default function SchemesPage() {
 
     /* 🔹 Limit to 10 for demo */
     return list.slice(0, 10);
-  }, [search, category]);
+  }, [search, category, baseSchemes]);
 
   if (panel !== 'user') {
     return (
