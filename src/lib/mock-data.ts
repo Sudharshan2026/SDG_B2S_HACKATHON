@@ -135,15 +135,60 @@ export function setComplaints(data: Complaint[]) {
 }
 
 export function addComplaint(c: Omit<Complaint, 'id' | 'ticketId' | 'timeline'>): Complaint {
+  // 1. Validate required fields and types
+  if (!c.districtId || typeof c.districtId !== 'string') throw new Error('Invalid districtId');
+  if (!c.departmentId || typeof c.departmentId !== 'string') throw new Error('Invalid departmentId');
+  if (!c.description || typeof c.description !== 'string') throw new Error('Invalid description');
+  if (!c.category || typeof c.category !== 'string') throw new Error('Invalid category');
+  if (!c.status || typeof c.status !== 'string') throw new Error('Invalid status');
+  if (!c.priority || typeof c.priority !== 'string') throw new Error('Invalid priority');
+
+  // 2. Validate district existence
+  const district = districts.find(d => d.id === c.districtId);
+  if (!district) throw new Error(`District with ID ${c.districtId} not found`);
+
+  // 3. Validate department existence and relation to district
+  const dept = departments.find(d => d.id === c.departmentId);
+  if (!dept) throw new Error(`Department with ID ${c.departmentId} not found`);
+  if (dept.districtId !== c.districtId) {
+    throw new Error(`Department ${c.departmentId} does not belong to district ${c.districtId}`);
+  }
+
+  // 4. Sanitize and validate description
+  const trimmedDescription = c.description.trim();
+  if (trimmedDescription.length < 10) {
+    throw new Error('Description must be at least 10 characters long');
+  }
+  if (trimmedDescription.length > 2000) {
+    throw new Error('Description must be at most 2000 characters long');
+  }
+
+  // 5. Validate status and priority values
+  const validStatuses: Complaint['status'][] = ['pending', 'in_progress', 'resolved', 'closed', 'escalated'];
+  if (!validStatuses.includes(c.status)) throw new Error('Invalid complaint status');
+
+  const validPriorities: Complaint['priority'][] = ['low', 'medium', 'high'];
+  if (!validPriorities.includes(c.priority)) throw new Error('Invalid complaint priority');
+
   const list = getComplaints();
   const seq = String(list.length + 1).padStart(4, '0');
-  const ticketId = `HC-D1-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-${seq}`;
+  const ticketId = `HC-${c.districtId.toUpperCase()}-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-${seq}`;
+
+  const now = new Date().toISOString();
   const newComplaint: Complaint = {
     ...c,
-    id: `c${Date.now()}`,
+    description: trimmedDescription,
+    id: `c${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
     ticketId,
-    timeline: [{ id: `cl${Date.now()}`, statusFrom: 'pending', statusTo: 'pending', createdAt: new Date().toISOString() }],
+    createdAt: now,
+    timeline: [{
+      id: `cl${Date.now()}`,
+      statusFrom: 'pending',
+      statusTo: 'pending',
+      createdAt: now
+    }],
   };
+
   list.push(newComplaint);
   setComplaints(list);
   return newComplaint;
