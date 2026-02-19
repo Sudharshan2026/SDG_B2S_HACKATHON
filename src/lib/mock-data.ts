@@ -76,7 +76,9 @@ export function getUtilities(): Utility[] {
         const parsed = JSON.parse(stored);
         return [parsed.electricity || defaultUtilities[0], parsed.water || defaultUtilities[1]].filter(Boolean);
       }
-    } catch (_) {}
+    } catch (error) {
+      console.error('Error loading utilities from localStorage:', error);
+    }
   }
   return [...defaultUtilities];
 }
@@ -120,7 +122,9 @@ export function getComplaints(): Complaint[] {
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) return JSON.parse(stored);
-    } catch (_) {}
+    } catch (error) {
+      console.error('Error loading complaints from localStorage:', error);
+    }
   }
   return [...complaintsData];
 }
@@ -130,7 +134,9 @@ export function setComplaints(data: Complaint[]) {
   if (typeof window !== 'undefined') {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-    } catch (_) {}
+    } catch (error) {
+      console.error('Error saving complaints to localStorage:', error);
+    }
   }
 }
 

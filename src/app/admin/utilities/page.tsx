@@ -22,7 +22,9 @@ export default function AdminUtilitiesPage() {
         if (parsed.electricity) setElectricity(parsed.electricity);
         if (parsed.water) setWater(parsed.water);
       }
-    } catch (_) {}
+    } catch (error) {
+      console.error('Error loading utilities from localStorage:', error);
+    }
   }, []);
 
   const save = () => {
@@ -30,7 +32,9 @@ export default function AdminUtilitiesPage() {
       localStorage.setItem(UTILITIES_STORAGE_KEY, JSON.stringify({ electricity, water }));
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
-    } catch (_) {}
+    } catch (error) {
+      console.error('Error saving utilities to localStorage:', error);
+    }
   };
 
   if (panel !== 'admin') {
