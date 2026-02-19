@@ -88,17 +88,21 @@ export default function ChatbotPage() {
 
   const handleSubmitComplaint = () => {
     if (!complaintForm.description.trim()) return;
-    const dept = departments.find((d) => d.id === complaintForm.departmentId);
-    const complaint = addComplaint({
-      districtId: 'd1',
-      departmentId: complaintForm.departmentId,
-      description: complaintForm.description.trim(),
-      category: complaintForm.category,
-      status: 'pending',
-      priority: 'medium',
-      createdAt: new Date().toISOString(),
-    });
-    setSubmittedTicket(complaint.ticketId);
+    try {
+      const complaint = addComplaint({
+        districtId: 'd1',
+        departmentId: complaintForm.departmentId,
+        description: complaintForm.description.trim(),
+        category: complaintForm.category,
+        status: 'pending',
+        priority: 'medium',
+        createdAt: new Date().toISOString(),
+      });
+      setSubmittedTicket(complaint.ticketId);
+    } catch (error) {
+      console.error('Failed to submit complaint:', error);
+      alert(error instanceof Error ? error.message : 'Failed to submit complaint');
+    }
   };
 
   if (panel !== 'user') {
