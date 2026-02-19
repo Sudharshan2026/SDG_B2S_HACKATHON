@@ -14,23 +14,6 @@ interface Message {
   timestamp: Date;
 }
 
-const DEMO_RESPONSES: Record<string, string> = {
-  schemes: 'You can find all active government schemes in the Schemes section. Filter by category and search for eligibility, benefits, and required documents.',
-  electricity: 'Check the Utilities section for electricity schedules and outages. You can see current status and planned maintenance.',
-  water: 'Water supply timings are updated in the Utilities section. Officials update them regularly.',
-  complaint: 'To file a complaint, please describe the issue below. Include category (infrastructure, utilities, sanitation, etc.), location, and you can attach a photo. I will create a ticket for you.',
-  default: 'I am your Hometown Connect assistant. I can help with: Government schemes, utility schedules, complaint filing, and official contacts. What would you like to know?',
-};
-
-function getBotResponse(text: string): string {
-  const lower = text.toLowerCase();
-  if (lower.includes('scheme')) return DEMO_RESPONSES.schemes;
-  if (lower.includes('electric') || lower.includes('power')) return DEMO_RESPONSES.electricity;
-  if (lower.includes('water')) return DEMO_RESPONSES.water;
-  if (lower.includes('complaint') || lower.includes('grievance') || lower.includes('problem')) return DEMO_RESPONSES.complaint;
-  return DEMO_RESPONSES.default;
-}
-
 export default function ChatbotPage() {
   const { panel } = useApp();
   const [messages, setMessages] = useState<Message[]>([
@@ -42,6 +25,7 @@ export default function ChatbotPage() {
     },
   ]);
   const [input, setInput] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const searchParams = useSearchParams();
   const [mode, setMode] = useState<'chat' | 'complaint' | 'track'>('chat');
 
@@ -63,19 +47,59 @@ export default function ChatbotPage() {
     scrollRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  const handleSend = () => {
+  const handleSend = async () => {
     const trimmed = input.trim();
-    if (!trimmed) return;
+    if (!trimmed || isLoading) return;
 
-    const userMsg: Message = { id: Date.now().toString(), role: 'user', content: trimmed, timestamp: new Date() };
+    const userMsg: Message = { 
+      id: Date.now().toString(), 
+      role: 'user', 
+      content: trimmed, 
+      timestamp: new Date() 
+    };
+    
     setMessages((m) => [...m, userMsg]);
     setInput('');
+    setIsLoading(true);
 
-    setTimeout(() => {
-      const reply = getBotResponse(trimmed);
-      const botMsg: Message = { id: `b-${Date.now()}`, role: 'assistant', content: reply, timestamp: new Date() };
-      setMessages((m) => [...m, botMsg]);
-    }, 500);
+    try {
+      // Call the LangChain API with xAI
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          messages: [...messages, userMsg].map(m => ({
+            role: m.role,
+            content: m.content
+          }))
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success && data.message) {
+        const botMsg: Message = { 
+          id: `b-${Date.now()}`, 
+          role: 'assistant', 
+          content: data.message, 
+          timestamp: new Date() 
+        };
+        setMessages((m) => [...m, botMsg]);
+      } else {
+        throw new Error(data.error || 'Failed to get response');
+      }
+    } catch (error) {
+      console.error('Chat error:', error);
+      const errorMsg: Message = { 
+        id: `e-${Date.now()}`, 
+        role: 'assistant', 
+        content: 'Sorry, I encountered an error. Please ensure the XAI_API_KEY is configured correctly.', 
+        timestamp: new Date() 
+      };
+      setMessages((m) => [...m, errorMsg]);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleTrack = () => {
@@ -283,6 +307,13 @@ export default function ChatbotPage() {
             </div>
           </div>
         ))}
+        {isLoading && (
+          <div className="flex justify-start">
+            <div className="max-w-[85%] px-4 py-2 rounded-2xl bg-slate-100 text-slate-900 rounded-bl-md">
+              <p className="text-sm">Thinking...</p>
+            </div>
+          </div>
+        )}
         <div ref={scrollRef} />
       </div>
 
@@ -291,13 +322,15 @@ export default function ChatbotPage() {
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && handleSend()}
+          onKeyDown={(e) => e.key === 'Enter' && !isLoading && handleSend()}
           placeholder="Ask about schemes, utilities, officials..."
-          className="flex-1 px-4 py-2 rounded-lg border border-slate-200 bg-white text-slate-800"
+          disabled={isLoading}
+          className="flex-1 px-4 py-2 rounded-lg border border-slate-200 bg-white text-slate-800 disabled:opacity-50"
         />
         <button
           onClick={handleSend}
-          className="p-2 rounded-lg bg-slate-700 text-white"
+          disabled={isLoading || !input.trim()}
+          className="p-2 rounded-lg bg-slate-700 text-white disabled:opacity-50"
         >
           <Send size={20} />
         </button>
