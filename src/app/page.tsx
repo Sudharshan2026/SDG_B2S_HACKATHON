@@ -18,7 +18,7 @@ import { schemes, alerts } from '@/lib/mock-data';
 export default function HomePage() {
 
   // ✅ Prevent infinite re-render
-  const panel = useApp((state) => state.panel);
+  const { panel } = useApp();
 
   // ✅ Memoized data
   const activeSchemes = useMemo(

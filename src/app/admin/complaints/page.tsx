@@ -15,13 +15,18 @@ const demoComplaints: Complaint[] = [
   {
     id: 'dc1',
     ticketId: 'CMP-1001',
+    districtId: 'd1',
+    category: 'infrastructure',
+    priority: 'medium',
     description: 'Street light not working near bus stand.',
     departmentId: 'electricity',
     status: 'pending',
+    createdAt: new Date().toISOString(),
     timeline: [
       {
         id: 't1',
         createdAt: new Date().toISOString(),
+        statusFrom: 'pending',
         statusTo: 'pending',
         note: 'Complaint registered',
       },
@@ -30,13 +35,18 @@ const demoComplaints: Complaint[] = [
   {
     id: 'dc2',
     ticketId: 'CMP-1002',
+    districtId: 'd1',
+    category: 'infrastructure',
+    priority: 'high',
     description: 'Water supply interruption in Ward 5.',
     departmentId: 'water',
     status: 'in_progress',
+    createdAt: new Date().toISOString(),
     timeline: [
       {
         id: 't2',
         createdAt: new Date().toISOString(),
+        statusFrom: 'pending',
         statusTo: 'in_progress',
         note: 'Inspection team assigned',
       },
@@ -45,13 +55,18 @@ const demoComplaints: Complaint[] = [
   {
     id: 'dc3',
     ticketId: 'CMP-1003',
+    districtId: 'd1',
+    category: 'sanitation',
+    priority: 'medium',
     description: 'Garbage not collected for 3 days.',
     departmentId: 'sanitation',
     status: 'pending',
+    createdAt: new Date().toISOString(),
     timeline: [
       {
         id: 't3',
         createdAt: new Date().toISOString(),
+        statusFrom: 'pending',
         statusTo: 'pending',
       },
     ],
@@ -59,13 +74,18 @@ const demoComplaints: Complaint[] = [
   {
     id: 'dc4',
     ticketId: 'CMP-1004',
+    districtId: 'd1',
+    category: 'infrastructure',
+    priority: 'high',
     description: 'Road potholes causing traffic issues.',
     departmentId: 'public_works',
     status: 'resolved',
+    createdAt: new Date().toISOString(),
     timeline: [
       {
         id: 't4',
         createdAt: new Date().toISOString(),
+        statusFrom: 'in_progress',
         statusTo: 'resolved',
         note: 'Temporary repair completed',
       },
@@ -74,13 +94,18 @@ const demoComplaints: Complaint[] = [
   {
     id: 'dc5',
     ticketId: 'CMP-1005',
+    districtId: 'd1',
+    category: 'sanitation',
+    priority: 'medium',
     description: 'Broken drainage cover on main road.',
     departmentId: 'sanitation',
     status: 'pending',
+    createdAt: new Date().toISOString(),
     timeline: [
       {
         id: 't5',
         createdAt: new Date().toISOString(),
+        statusFrom: 'pending',
         statusTo: 'pending',
       },
     ],
@@ -88,13 +113,18 @@ const demoComplaints: Complaint[] = [
   {
     id: 'dc6',
     ticketId: 'CMP-1006',
+    districtId: 'd1',
+    category: 'electricity',
+    priority: 'high',
     description: 'Frequent power fluctuations reported.',
     departmentId: 'electricity',
     status: 'escalated',
+    createdAt: new Date().toISOString(),
     timeline: [
       {
         id: 't6',
         createdAt: new Date().toISOString(),
+        statusFrom: 'pending',
         statusTo: 'escalated',
         note: 'Forwarded to higher authority',
       },
