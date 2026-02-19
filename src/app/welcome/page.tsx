@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-export default function WelcomePage() {
+export default function House() {
 	return (
 		<main className="min-h-screen bg-gray-50 text-gray-900 antialiased">
 			<div className="max-w-3xl mx-auto px-4 py-8">

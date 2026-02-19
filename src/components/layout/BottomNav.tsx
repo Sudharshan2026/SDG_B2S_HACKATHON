@@ -6,7 +6,7 @@ import { Home, FileText, Zap, Newspaper, MessageCircle, Users } from 'lucide-rea
 import { useApp } from '@/lib/store';
 
 const userNav = [
-  { href: '/', icon: Home, label: 'Home' },
+  { href: '/home', icon: Home, label: 'Home' },
   { href: '/schemes', icon: FileText, label: 'Schemes' },
   { href: '/utilities', icon: Zap, label: 'Utilities' },
   { href: '/news', icon: Newspaper, label: 'News' },
@@ -24,7 +24,7 @@ export function BottomNav() {
     <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 safe-area-pb z-50">
       <div className="flex justify-around py-3 max-w-2xl mx-auto">
         {userNav.map(({ href, icon: Icon, label }) => {
-          const isActive = pathname === href || (href !== '/' && pathname.startsWith(href));
+          const isActive = pathname === href || (href !== '/home' && pathname.startsWith(href));
           return (
             <Link
               key={href}

@@ -12,7 +12,7 @@ export function Header() {
     super: 'Super Admin Panel',
   };
 
-  const homeHref = panel === 'user' ? '/' : panel === 'admin' ? '/admin' : '/super';
+  const homeHref = panel === 'user' ? '/home' : panel === 'admin' ? '/admin' : '/super';
 
   return (
     <header className="sticky top-0 z-40 bg-white border-b border-slate-200">
